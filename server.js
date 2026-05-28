@@ -44,6 +44,12 @@ function getChangeReason(guideline, current, revision) {
   return "개정사항 없음.";
 }
 
+function hasHwpFile(files) {
+  return Object.values(files || {}).flat().some((file) =>
+    file.originalname.toLowerCase().endsWith(".hwp")
+  );
+}
+
 app.post(
   "/api/compare",
   upload.fields([
@@ -53,6 +59,12 @@ app.post(
   ]),
   async (req, res) => {
     try {
+      if (hasHwpFile(req.files)) {
+        return res.status(400).json({
+          error: "현재 1차 버전은 TXT 파일 비교만 지원합니다. HWP 직접 분석 기능은 다음 단계에서 추가해야 합니다. 우선 HWP를 TXT로 저장한 뒤 업로드해 주세요."
+        });
+      }
+
       const guidelineText = req.files.guideline[0].buffer.toString("utf-8");
       const currentText = req.files.current[0].buffer.toString("utf-8");
       const revisionText = req.files.revision[0].buffer.toString("utf-8");
