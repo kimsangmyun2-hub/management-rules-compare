@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as XLSX from "xlsx";
 
 export default function App() {
   const [guidelineFile, setGuidelineFile] = useState(null);
@@ -23,7 +24,43 @@ export default function App() {
     });
 
     const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "비교표 생성 중 오류가 발생했습니다.");
+      return;
+    }
+
     setRows(data.rows || []);
+  };
+
+  const handleExcelDownload = () => {
+    if (rows.length === 0) {
+      alert("저장할 비교표가 없습니다.");
+      return;
+    }
+
+    const excelRows = rows.map((row) => ({
+      조문번호: row.article,
+      "관리규약준칙(제0차)": row.guideline,
+      "현행 관리규약": row.current,
+      "관리규약 개정(안)": row.revision,
+      개정사유: row.reason
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelRows);
+    worksheet["!cols"] = [
+      { wch: 14 },
+      { wch: 55 },
+      { wch: 55 },
+      { wch: 55 },
+      { wch: 45 }
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "3단비교표");
+
+    const today = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(workbook, `관리규약_3단비교표_${today}.xlsx`);
   };
 
   const renderDropBox = (title, description, file, setFile) => (
@@ -60,7 +97,7 @@ export default function App() {
       >
         <input
           type="file"
-          accept=".txt,.hwp"
+          accept=".txt,.hwp,.pdf"
           style={{ display: "none" }}
           onChange={(e) => setFile(e.target.files[0])}
         />
@@ -73,7 +110,7 @@ export default function App() {
           또는 박스를 클릭하여 파일 선택
         </div>
         <div style={{ marginTop: 10, color: "#829ab1", fontSize: 13 }}>
-          지원 형식: TXT / HWP
+          지원 형식: TXT / HWP / PDF
         </div>
 
         {file && (
@@ -167,7 +204,7 @@ export default function App() {
             )}
           </div>
 
-          <div style={{ display: "flex", justifyContent: "center", marginTop: 34 }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: 14, marginTop: 34, flexWrap: "wrap" }}>
             <button
               onClick={handleCompare}
               style={{
@@ -184,6 +221,25 @@ export default function App() {
             >
               3단비교표 생성
             </button>
+
+            {rows.length > 0 && (
+              <button
+                onClick={handleExcelDownload}
+                style={{
+                  padding: "17px 30px",
+                  background: "#1d4ed8",
+                  color: "white",
+                  border: "none",
+                  borderRadius: 14,
+                  cursor: "pointer",
+                  fontSize: 19,
+                  fontWeight: 800,
+                  boxShadow: "0 8px 18px rgba(29, 78, 216, 0.22)"
+                }}
+              >
+                엑셀 저장
+              </button>
+            )}
           </div>
         </div>
 
@@ -199,6 +255,24 @@ export default function App() {
               boxShadow: "0 8px 25px rgba(15, 23, 42, 0.06)"
             }}
           >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <h2 style={{ margin: 0, fontSize: 22 }}>3단비교표 결과</h2>
+              <button
+                onClick={handleExcelDownload}
+                style={{
+                  padding: "10px 18px",
+                  background: "#1d4ed8",
+                  color: "white",
+                  border: "none",
+                  borderRadius: 10,
+                  cursor: "pointer",
+                  fontWeight: 800
+                }}
+              >
+                엑셀 저장
+              </button>
+            </div>
+
             <table
               cellPadding="12"
               style={{
