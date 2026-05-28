@@ -1,9 +1,15 @@
 import express from "express";
 import cors from "cors";
 import multer from "multer";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -87,6 +93,12 @@ app.post(
   }
 );
 
-app.listen(3000, () => {
-  console.log("관리규약 3단비교표작성 서버 실행 중");
+app.use(express.static(path.join(__dirname, "dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
+
+app.listen(PORT, () => {
+  console.log(`관리규약 3단비교표작성 서버 실행 중: ${PORT}`);
 });
