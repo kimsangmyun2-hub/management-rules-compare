@@ -3,7 +3,7 @@ import cors from "cors";
 import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
-import pdf from "pdf-parse";
+import pdfParse from "pdf-parse/lib/pdf-parse.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -68,8 +68,6 @@ function getChangeReason(guideline, current, revision) {
 }
 
 function extractTextFromHwpBuffer(buffer) {
-  // 1차 HWP 지원: 바이너리 안에 노출되는 한글/숫자/기호 텍스트를 최대한 추출합니다.
-  // 일부 HWP는 압축/암호화/복합문서 구조 때문에 본문 추출이 제한될 수 있습니다.
   const unicodeText = buffer.toString("utf16le");
   const utf8Text = buffer.toString("utf8");
   const combined = `${unicodeText}\n${utf8Text}`;
@@ -88,11 +86,13 @@ async function extractTextFromFile(file) {
   const name = file.originalname.toLowerCase();
 
   if (name.endsWith(".pdf")) {
-    const data = await pdf(file.buffer);
+    const data = await pdfParse(file.buffer);
     const text = cleanText(data.text);
+
     if (!text) {
       throw new Error(`${file.originalname} PDF에서 텍스트를 추출하지 못했습니다. 스캔 PDF는 OCR 기능 추가 전에는 지원되지 않습니다.`);
     }
+
     return text;
   }
 
