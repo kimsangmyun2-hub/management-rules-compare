@@ -26,22 +26,31 @@ export default function App() {
     setRows(data.rows || []);
   };
 
-  const dropBoxStyle = {
-    border: "2px dashed #0f766e",
-    borderRadius: 14,
-    padding: 30,
-    marginTop: 12,
-    background: "#f8fffd",
-    cursor: "pointer",
-    textAlign: "center"
-  };
-
-  const renderDropBox = (title, file, setFile) => (
-    <div style={{ marginTop: 35 }}>
-      <h3 style={{ marginBottom: 10 }}>{title}</h3>
+  const renderDropBox = (title, description, file, setFile) => (
+    <div
+      style={{
+        background: "white",
+        border: "1px solid #d9e2ec",
+        borderRadius: 18,
+        padding: 22,
+        boxShadow: "0 6px 20px rgba(15, 23, 42, 0.06)"
+      }}
+    >
+      <div style={{ fontSize: 20, fontWeight: 800, color: "#102a43" }}>{title}</div>
+      <div style={{ marginTop: 6, color: "#627d98", fontSize: 14 }}>{description}</div>
 
       <label
-        style={dropBoxStyle}
+        style={{
+          display: "block",
+          marginTop: 18,
+          border: "2px dashed #7aa99b",
+          borderRadius: 16,
+          padding: "30px 18px",
+          background: "#f7fffc",
+          cursor: "pointer",
+          textAlign: "center",
+          minHeight: 150
+        }}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
@@ -56,13 +65,14 @@ export default function App() {
           onChange={(e) => setFile(e.target.files[0])}
         />
 
-        <div style={{ fontSize: 42 }}>📂</div>
-
-        <div style={{ marginTop: 10, fontWeight: "bold" }}>
-          파일을 끌어다 놓거나 클릭하여 업로드
+        <div style={{ fontSize: 42 }}>📁</div>
+        <div style={{ marginTop: 12, fontWeight: 800, color: "#102a43" }}>
+          파일을 끌어다 놓기
         </div>
-
-        <div style={{ marginTop: 10, color: "#666" }}>
+        <div style={{ marginTop: 6, color: "#486581", fontSize: 14 }}>
+          또는 박스를 클릭하여 파일 선택
+        </div>
+        <div style={{ marginTop: 10, color: "#829ab1", fontSize: 13 }}>
           지원 형식: TXT / HWP
         </div>
 
@@ -70,14 +80,15 @@ export default function App() {
           <div
             style={{
               marginTop: 18,
-              padding: 10,
-              borderRadius: 8,
+              padding: "10px 12px",
+              borderRadius: 10,
               background: "#d1fae5",
               color: "#065f46",
-              fontWeight: "bold"
+              fontWeight: 800,
+              wordBreak: "break-all"
             }}
           >
-            선택 파일: {file.name}
+            선택 완료: {file.name}
           </div>
         )}
       </label>
@@ -87,92 +98,141 @@ export default function App() {
   return (
     <div
       style={{
-        padding: 30,
-        fontFamily: "sans-serif",
-        maxWidth: 1600,
-        margin: "0 auto"
+        minHeight: "100vh",
+        background: "linear-gradient(180deg, #f4f7fb 0%, #eef7f4 100%)",
+        fontFamily: "Arial, sans-serif",
+        color: "#102a43"
       }}
     >
-      <h1 style={{ fontSize: 48, marginBottom: 10 }}>
-        📑 관리규약 3단비교표작성
-      </h1>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 24px" }}>
+        <div
+          style={{
+            background: "white",
+            borderRadius: 24,
+            padding: "34px 38px",
+            boxShadow: "0 12px 35px rgba(15, 23, 42, 0.08)",
+            border: "1px solid #d9e2ec"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+            <div
+              style={{
+                width: 62,
+                height: 62,
+                borderRadius: 18,
+                background: "#e6fffa",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 34
+              }}
+            >
+              📑
+            </div>
+            <div>
+              <h1 style={{ margin: 0, fontSize: 36, letterSpacing: "-1px" }}>
+                관리규약 3단비교표작성
+              </h1>
+              <p style={{ margin: "10px 0 0", color: "#486581", fontSize: 17 }}>
+                관리규약준칙, 현행 관리규약, 관리규약 개정안을 비교하여 3단비교표와 개정사유를 자동 작성합니다.
+              </p>
+            </div>
+          </div>
 
-      <p style={{ fontSize: 20, lineHeight: 1.6 }}>
-        관리규약준칙, 현행 관리규약, 관리규약 개정안을 비교하여
-        3단비교표와 개정사유를 자동 작성합니다.
-      </p>
-
-      {renderDropBox(
-        "① 관리규약준칙(제0차)",
-        guidelineFile,
-        setGuidelineFile
-      )}
-
-      {renderDropBox(
-        "② 현행 관리규약",
-        currentFile,
-        setCurrentFile
-      )}
-
-      {renderDropBox(
-        "③ 관리규약 개정(안)",
-        revisionFile,
-        setRevisionFile
-      )}
-
-      <button
-        onClick={handleCompare}
-        style={{
-          marginTop: 40,
-          padding: "16px 28px",
-          background: "#0f766e",
-          color: "white",
-          border: "none",
-          borderRadius: 12,
-          cursor: "pointer",
-          fontSize: 20,
-          fontWeight: "bold"
-        }}
-      >
-        3단비교표 생성
-      </button>
-
-      {rows.length > 0 && (
-        <div style={{ overflowX: "auto", marginTop: 50 }}>
-          <table
-            border="1"
-            cellPadding="12"
+          <div
             style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              minWidth: 1600,
-              background: "white"
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gap: 22,
+              marginTop: 34
             }}
           >
-            <thead style={{ background: "#0f766e", color: "white" }}>
-              <tr>
-                <th>조문번호</th>
-                <th>관리규약준칙(제0차)</th>
-                <th>현행 관리규약</th>
-                <th>관리규약 개정(안)</th>
-                <th>개정사유</th>
-              </tr>
-            </thead>
+            {renderDropBox(
+              "① 관리규약준칙(제0차)",
+              "비교 기준이 되는 준칙 파일",
+              guidelineFile,
+              setGuidelineFile
+            )}
+            {renderDropBox(
+              "② 현행 관리규약",
+              "현재 사용 중인 관리규약 파일",
+              currentFile,
+              setCurrentFile
+            )}
+            {renderDropBox(
+              "③ 관리규약 개정(안)",
+              "개정하려는 관리규약안 파일",
+              revisionFile,
+              setRevisionFile
+            )}
+          </div>
 
-            <tbody>
-              {rows.map((row, index) => (
-                <tr key={index}>
-                  <td>{row.article}</td>
-                  <td style={{ whiteSpace: "pre-wrap" }}>{row.guideline}</td>
-                  <td style={{ whiteSpace: "pre-wrap" }}>{row.current}</td>
-                  <td style={{ whiteSpace: "pre-wrap" }}>{row.revision}</td>
-                  <td style={{ whiteSpace: "pre-wrap" }}>{row.reason}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 34 }}>
+            <button
+              onClick={handleCompare}
+              style={{
+                padding: "17px 36px",
+                background: "#0f766e",
+                color: "white",
+                border: "none",
+                borderRadius: 14,
+                cursor: "pointer",
+                fontSize: 19,
+                fontWeight: 800,
+                boxShadow: "0 8px 18px rgba(15, 118, 110, 0.25)"
+              }}
+            >
+              3단비교표 생성
+            </button>
+          </div>
         </div>
-      )}
+
+        {rows.length > 0 && (
+          <div
+            style={{
+              overflowX: "auto",
+              marginTop: 34,
+              background: "white",
+              borderRadius: 18,
+              padding: 18,
+              border: "1px solid #d9e2ec",
+              boxShadow: "0 8px 25px rgba(15, 23, 42, 0.06)"
+            }}
+          >
+            <table
+              cellPadding="12"
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                minWidth: 1500,
+                background: "white"
+              }}
+            >
+              <thead style={{ background: "#0f766e", color: "white" }}>
+                <tr>
+                  <th>조문번호</th>
+                  <th>관리규약준칙(제0차)</th>
+                  <th>현행 관리규약</th>
+                  <th>관리규약 개정(안)</th>
+                  <th>개정사유</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {rows.map((row, index) => (
+                  <tr key={index} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                    <td>{row.article}</td>
+                    <td style={{ whiteSpace: "pre-wrap" }}>{row.guideline}</td>
+                    <td style={{ whiteSpace: "pre-wrap" }}>{row.current}</td>
+                    <td style={{ whiteSpace: "pre-wrap" }}>{row.revision}</td>
+                    <td style={{ whiteSpace: "pre-wrap" }}>{row.reason}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
