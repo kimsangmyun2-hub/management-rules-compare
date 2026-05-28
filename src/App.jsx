@@ -63,6 +63,42 @@ export default function App() {
     XLSX.writeFile(workbook, `관리규약_3단비교표_${today}.xlsx`);
   };
 
+  const getCompareType = (current, revision) => {
+    if (!current && revision) return "new";
+    if (current && !revision) return "deleted";
+    if (current !== revision) return "changed";
+    return "same";
+  };
+
+  const getTextStyle = (type) => {
+    const baseStyle = {
+      whiteSpace: "pre-wrap",
+      background: "white",
+      color: "#111827",
+      lineHeight: 1.7,
+      fontSize: 14
+    };
+
+    if (type === "new") {
+      return {
+        ...baseStyle,
+        color: "#1d4ed8",
+        fontWeight: 700
+      };
+    }
+
+    if (type === "deleted") {
+      return {
+        ...baseStyle,
+        color: "#dc2626",
+        textDecoration: "line-through",
+        textDecorationThickness: "2px"
+      };
+    }
+
+    return baseStyle;
+  };
+
   const renderDropBox = (title, description, file, setFile) => (
     <div
       style={{
@@ -293,15 +329,21 @@ export default function App() {
               </thead>
 
               <tbody>
-                {rows.map((row, index) => (
-                  <tr key={index} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                    <td>{row.article}</td>
-                    <td style={{ whiteSpace: "pre-wrap" }}>{row.guideline}</td>
-                    <td style={{ whiteSpace: "pre-wrap" }}>{row.current}</td>
-                    <td style={{ whiteSpace: "pre-wrap" }}>{row.revision}</td>
-                    <td style={{ whiteSpace: "pre-wrap" }}>{row.reason}</td>
-                  </tr>
-                ))}
+                {rows.map((row, index) => {
+                  const compareType = getCompareType(row.current, row.revision);
+
+                  return (
+                    <tr key={index} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                      <td style={{ fontWeight: 700 }}>{row.article}</td>
+                      <td style={getTextStyle(compareType)}>{row.guideline}</td>
+                      <td style={getTextStyle(compareType)}>{row.current}</td>
+                      <td style={getTextStyle(compareType)}>{row.revision}</td>
+                      <td style={{ whiteSpace: "pre-wrap", background: "white", color: "#111827", lineHeight: 1.7 }}>
+                        {row.reason}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
